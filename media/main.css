@@ -1,12 +1,11 @@
-
 body {
   overflow: hidden;
   margin: 0;
   padding: 0;
-  background-image: url('background-hill.png');
   background-repeat: no-repeat;
-  background-attachment: fixed;  
+  background-attachment: fixed;
   background-size: cover;
+  background-color: #d9d9d9;
 }
 
 .box {
@@ -18,15 +17,91 @@ body {
 }
 
 .monster {
-  height: 150px;
+  height: 50vh;
+  image-rendering: pixelated;
   transition: filter 0.3s ease, transform 0.5s ease;
+  animation: pulse 2s infinite;
 }
 
 @keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  50% { transform: translateX(0); }
-  75% { transform: translateX(10px); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  75% {
+    transform: translateX(10px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
+@keyframes pulse {
+  0% {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+  50% {
+    -webkit-transform: scale3d(1.05, 1.05, 1.05);
+    transform: scale3d(1.05, 1.05, 1.05);
+  }
+  100% {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+.damage-float {
+  font-size: 20px;
+  font-weight: bold;
+  color: red;
+  animation: floatUp 1s ease-out forwards;
+  pointer-events: none;
+  z-index: 1000;
+  transform: translate(-50%, 0);
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50px);
+  }
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-radius: 2px;
+  background-color: grey;
+  color: whitesmoke;
+  border: none;
+  margin-left: 4px;
+  margin-top: 4px;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
