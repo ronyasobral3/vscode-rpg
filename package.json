@@ -3,7 +3,7 @@
   "publisher": "Rony1533",
   "displayName": "Code RPG",
   "description": "Keep up with your coding and fight the monsters.",
-  "icon": "media/Frog.png",
+  "icon": "media/monster/Icon1.png",
   "version": "1.3.5",
   "author": {
     "name": "Rony Alves Sobral",
@@ -11,6 +11,12 @@
   },
   "engines": {
     "vscode": "^1.92.0"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/rony1533/vscode-rpg",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rony1533/vscode-rpg.git"
   },
   "categories": [
     "Other"
@@ -28,6 +34,7 @@
     "views": {
       "explorer": [
         {
+          "icon": "media/monster/Icon1.png",
           "type": "webview",
           "id": "rpg",
           "name": "VS CODE RPG"
