@@ -11,8 +11,8 @@
 - Replaced old monsters with new ones.
 - Improved input handling by ignoring unintended clicks while writing.
 
-  1.2.0 - Added animation of pulsation for the monster and improved style of health bar.
+1.2.0 - Added animation of pulsation for the monster and improved style of health bar.
 
-  1.1.3 - Added health points for monsters. When a monster's health reaches zero, it will automatically be replaced with a different monster.
+1.1.3 - Added health points for monsters. When a monster's health reaches zero, it will automatically be replaced with a different monster.
 
-  1.0.2 - Initial release of codeRPG
+1.0.2 - Initial release of codeRPG
