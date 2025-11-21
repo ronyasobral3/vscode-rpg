@@ -6,6 +6,17 @@ body {
   background-attachment: fixed;
   background-size: cover;
   background-color: #d9d9d9;
+  background-image: url("../media/scena/land.png");
+}
+
+:root {
+  /* Theme variables */
+  --bg-color: #d9d9d9;
+  --health-bg: rgba(0, 0, 0, 0.25);
+  --health-fill: linear-gradient(90deg, #ff6b6b, #ff3b3b);
+  --damage-color: #ff2b2b;
+  --damage-font-size: 20px;
+  --damage-z: 1000;
 }
 
 .box {
@@ -57,13 +68,30 @@ body {
 }
 
 .damage-float {
-  font-size: 20px;
-  font-weight: bold;
-  color: red;
+  font-size: var(--damage-font-size);
+  font-weight: 800;
+  color: var(--damage-color);
   animation: floatUp 1s ease-out forwards;
   pointer-events: none;
-  z-index: 1000;
+  z-index: var(--damage-z);
   transform: translate(-50%, 0);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+}
+
+.critical-hit {
+  color: yellow;
+  text-shadow: 0 0 8px orange, 0 0 4px red;
+  font-size: var(--damage-font-size);
+  font-weight: 800;
+  animation: floatUp 1s ease-out forwards;
+  pointer-events: none;
+  z-index: var(--damage-z);
+  transform: translate(-50%, 0);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
 }
 
 @keyframes floatUp {
@@ -102,6 +130,79 @@ body {
   z-index: 1;
 }
 
+/* Healthbar styles used by the panel script */
+.healthbar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 5vh;
+  width: 60%;
+  height: 15px;
+  background: var(--health-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) inset;
+}
+
+.healthbar .health-indicator {
+  height: 100%;
+  width: 100%;
+  background: var(--health-fill);
+  transition: width 300ms ease-in-out;
+  border-radius: 12px 0 0 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) inset;
+}
+
+/* Small responsive tweak */
+@media (max-width: 600px) {
+  .monster {
+    height: 40vh;
+  }
+  .healthbar {
+    width: 80%;
+    bottom: 6vh;
+  }
+  .damage-float {
+    font-size: 16px;
+  }
+}
+
 .tooltip:hover .tooltiptext {
   visibility: visible;
+}
+
+.score {
+  color: black;
+}
+
+.score span {
+  color: red;
+  font-weight: bold;
+}
+
+/* Scores container: posiciona os scores no canto superior direito */
+.scores {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 6px;
+  z-index: 1200;
+  pointer-events: auto;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 220px) {
+  .scores {
+    top: 25px;
+    right: 8px;
+    gap: 8px;
+    padding: 4px 6px;
+  }
+  .scores .score {
+    font-size: 14px;
+  }
 }

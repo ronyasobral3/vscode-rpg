@@ -40,24 +40,30 @@ class rpgViewProvider implements vscode.WebviewViewProvider {
 
     // Escuta as alterações feitas no texto
     vscode.workspace.onDidChangeTextDocument((event) => {
-      this.monsterLife--;
+      var range1to20 = this.getRandomInt(1, 30);
 
-      this.updateMonsterStyle();
+      this.monsterLife =
+        range1to20 === 10 ? this.monsterLife - 5 : this.monsterLife - 1;
+
+      this.updateMonsterStyle(range1to20 === 10);
       this.updateMonsterLife(this.monsterLife);
 
-      if (this.monsterLife === 0) {
+      console.log(this.monsterLife);
+
+      if (this.monsterLife <= 0) {
         this.changeMonster();
         this.resetMonsterLife();
       }
     });
   }
 
-  private updateMonsterStyle() {
+  private updateMonsterStyle(isCritical: boolean) {
     const webview = this._view?.webview;
 
     if (webview) {
       webview.postMessage({
         command: "updateMonsterStyle",
+        value: isCritical ? "Critical damage!!" : "-1",
       });
     }
   }
@@ -141,17 +147,27 @@ class rpgViewProvider implements vscode.WebviewViewProvider {
       </button>
 				<div class="box">
 
-					<div style="display: block;">
-						<div style="display: flex; justify-content: center; width: 100%;">
-						<img id="monster" class="monster pulse" src="${imageMonsterUri}" alt="Monster" />
-						</div>
-					</div>
+          <div class="scores">
+            <div class="score">
+              <strong>Written:</strong>
+              <span id="typed-count">0</span>
+            </div>
+            <div class="score">
+              <strong>Defeated:</strong>
+              <span id="defeated-count">0</span>
+            </div>
+          </div>
 
-						<div class="health-bar">
-							<div class="health-indicator">
-								<div class="hit"></div>
-							</div>
-						</div>
+          <div style="display: block;">
+            <div style="display: flex; justify-content: center; width: 100%;">
+            <img id="monster" class="monster pulse" src="${imageMonsterUri}" alt="Monster" />
+            </div>
+          </div>
+
+            <div class="healthbar">
+              <div class="health-indicator" data-max-life="30">
+              </div>
+            </div>
 
 				</div>
 
