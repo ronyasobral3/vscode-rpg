@@ -1,6 +1,6 @@
 # Code RPG — Extensão interativa para VS Code
 
-![GIF RPG](https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2U3bDFpNThhdmtycDRqZW91cHU1a29qOGVuMnR2aGx6bHUzYzl2cyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ph4S6tpNvkbLfdq12W/giphy.gif)
+![GIF RPG](https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmw2Y2Nja203cWtnZXh3d29nMjFvcXI0a3N3bTNqcTZrOHQwcWN2aSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TFVHUcIPQ7NkUPC0Kc/giphy.gif)
 
 ENGLISH VERSION
 

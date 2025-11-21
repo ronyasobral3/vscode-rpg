@@ -6,7 +6,7 @@ ENGLISH VERSION
 
 Release notes formatted for the Visual Studio Code Marketplace.
 
-## [1.4.0] - 2024-08-31
+## [1.4.1] - 2024-08-31
 
 Highlights
 
