@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) [year] Rony Alves Sobral
+Copyright (c) 2025 Rony Alves Sobral
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
