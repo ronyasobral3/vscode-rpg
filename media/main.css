@@ -172,7 +172,8 @@ body {
 }
 
 .score {
-  color: black;
+  display: flex;
+  margin-top: 2px;
 }
 
 .score span {
@@ -180,29 +181,53 @@ body {
   font-weight: bold;
 }
 
-/* Scores container: posiciona os scores no canto superior direito */
-.scores {
+/* XP bar and user display */
+.xp-container {
   position: absolute;
-  top: 2px;
-  right: 2px;
+  right: 12px;
+  top: 12px;
   display: flex;
-  gap: 12px;
-  align-items: center;
-  padding: 6px 8px;
-  border-radius: 6px;
-  z-index: 1200;
-  pointer-events: auto;
-  background-color: rgba(255, 255, 255, 0.8);
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+  z-index: 1250;
+  pointer-events: none;
 }
 
-@media (max-width: 220px) {
-  .scores {
-    top: 25px;
-    right: 8px;
-    gap: 8px;
-    padding: 4px 6px;
+.xp-meta {
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  pointer-events: auto;
+  text-align: right;
+}
+
+.xp-bar {
+  width: 220px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.651);
+  pointer-events: auto;
+}
+
+.xp-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6b8cff, #3b62ff);
+  transition: width 300ms ease-in-out;
+}
+
+@media (max-width: 600px) {
+  .xp-bar {
+    width: 160px;
+    height: 10px;
   }
-  .scores .score {
-    font-size: 14px;
+  .xp-meta {
+    font-size: 12px;
+    padding: 3px 6px;
   }
 }

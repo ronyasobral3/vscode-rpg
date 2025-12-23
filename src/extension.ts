@@ -19,6 +19,10 @@ class rpgViewProvider implements vscode.WebviewViewProvider {
   private monsterImg: string = "Icon";
   private range1to10: number = 1;
   private monsterView: string = "";
+  private xp: number = 0;
+  private level: number = 1;
+  private userName: string =
+    process.env["USERNAME"] || process.env["USER"] || "Player";
 
   constructor(private readonly _extensionUri: vscode.Uri) {
     this.monsterView = this.monsterImg + this.range1to10.toString() + ".png";
@@ -38,23 +42,63 @@ class rpgViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
+    // envia dados iniciais ao webview: usuário e xp/level
+    const webview = webviewView.webview;
+    webview.postMessage({ command: "setUser", value: this.userName });
+    webview.postMessage({
+      command: "updateXp",
+      value: { xp: this.xp, level: this.level },
+    });
+
     // Escuta as alterações feitas no texto
     vscode.workspace.onDidChangeTextDocument((event) => {
-      var range1to20 = this.getRandomInt(1, 30);
+      var range1to30 = this.getRandomInt(1, 30);
 
-      this.monsterLife =
-        range1to20 === 10 ? this.monsterLife - 5 : this.monsterLife - 1;
+      // dano ao monstro
+      const damage = range1to30 === 10 ? 5 : 1;
+      this.monsterLife = this.monsterLife - damage;
 
-      this.updateMonsterStyle(range1to20 === 10);
+      this.updateMonsterStyle(range1to30 === 10);
       this.updateMonsterLife(this.monsterLife);
-
-      console.log(this.monsterLife);
+      this.updateXp();
 
       if (this.monsterLife <= 0) {
+        // bônus de XP por derrotar o monstro
+        this.xp += this.getRandomInt(10, 35);
+        this.checkLevelUp();
+        this.updateXp();
+
         this.changeMonster();
         this.resetMonsterLife();
       }
     });
+  }
+
+  private getXpToLevel(): number {
+    return Math.max(100 * this.level, 100);
+  }
+
+  private checkLevelUp() {
+    let threshold = this.getXpToLevel();
+    while (this.xp >= threshold) {
+      this.xp = this.xp - threshold;
+      this.level += 1;
+      threshold = this.getXpToLevel();
+    }
+  }
+
+  private updateXp() {
+    const webview = this._view?.webview;
+    console.log("Update xp >>> ");
+
+    if (webview) {
+      console.log("Entrouuu");
+
+      webview.postMessage({
+        command: "updateXp",
+        value: { xp: this.xp, level: this.level },
+      });
+    }
   }
 
   private updateMonsterStyle(isCritical: boolean) {
@@ -142,21 +186,19 @@ class rpgViewProvider implements vscode.WebviewViewProvider {
 			<body id="body">
       <button class="tooltip">?
       <span class="tooltiptext">
+        <div class="score">
+          <strong>Written:</strong>
+          <span id="typed-count">0</span>
+        </div>
+        <div class="score">
+          <strong>Defeated:</strong>
+          <span id="defeated-count">0</span>
+        </div>
+        <br/>
         Monster by: <a href="https://craftpix.net">Craftpix</a>
       </span>
       </button>
 				<div class="box">
-
-          <div class="scores">
-            <div class="score">
-              <strong>Written:</strong>
-              <span id="typed-count">0</span>
-            </div>
-            <div class="score">
-              <strong>Defeated:</strong>
-              <span id="defeated-count">0</span>
-            </div>
-          </div>
 
           <div style="display: block;">
             <div style="display: flex; justify-content: center; width: 100%;">

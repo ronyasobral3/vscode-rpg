@@ -5,21 +5,52 @@
 (function () {
   'use strict';
 
-  // Nós lemos os elementos DOM uma vez e validamos a presença deles.
+  // Query DOM elementos principais
   const monster = document.querySelector('#monster');
   const healthIndicator = document.querySelector('.health-indicator');
   const typedCountEl = document.getElementById('typed-count');
   const defeatedCountEl = document.getElementById('defeated-count');
 
+  // XP elements will be created dynamically if missing
+  let xpContainer = document.querySelector('.xp-container');
+  let xpFill = null;
+  let xpMeta = null;
+
   // Versão da API que permite persistir o estado do webview entre reloads da view
   const vscode = (typeof acquireVsCodeApi === 'function') ? acquireVsCodeApi() : null;
 
   // Estado local (persistido via vscode.setState quando possível)
-  const initialState = (vscode && vscode.getState && vscode.getState()) || { typedCount: 0, defeatedCount: 0 };
+  const initialState = (vscode && vscode.getState && vscode.getState()) || { typedCount: 0, defeatedCount: 0, xp: 0, level: 1, username: '' };
   let state = {
     typedCount: Number(initialState.typedCount) || 0,
-    defeatedCount: Number(initialState.defeatedCount) || 0
+    defeatedCount: Number(initialState.defeatedCount) || 0,
+    xp: Number(initialState.xp) || 0,
+    level: Number(initialState.level) || 1,
+    username: initialState.username || ''
   };
+
+  function ensureXpElements() {
+    if (xpContainer) {
+      return;
+    }
+    xpContainer = document.createElement('div');
+    xpContainer.className = 'xp-container';
+
+    xpMeta = document.createElement('div');
+    xpMeta.className = 'xp-meta';
+    xpMeta.textContent = state.username ? `${state.username} — Lv ${state.level}` : `Lv ${state.level}`;
+
+    const bar = document.createElement('div');
+    bar.className = 'xp-bar';
+    xpFill = document.createElement('div');
+    xpFill.className = 'xp-fill';
+    bar.appendChild(xpFill);
+
+    xpContainer.appendChild(bar);
+    xpContainer.appendChild(xpMeta);
+
+    document.body.appendChild(xpContainer);
+  }
 
   function renderScores() {
     if (typedCountEl) {
@@ -30,6 +61,18 @@
     }
   }
 
+  function renderXp() {
+    ensureXpElements();
+    const xpToLevel = Math.max(100 * state.level, 100);
+    const percent = Math.max(0, Math.min(100, (state.xp / xpToLevel) * 100));
+    if (xpFill) {
+      xpFill.style.width = percent + '%';
+    }
+    if (xpMeta) {
+      xpMeta.textContent = (state.username ? `${state.username} — ` : '') + `Lv ${state.level} (${state.xp}/${xpToLevel})`;
+    }
+  }
+
   function persistState() {
     if (!vscode || !vscode.setState) {
       return;
@@ -37,18 +80,18 @@
     try {
       vscode.setState(state);
     } catch (e) {
-      // não crítico
       console.warn('Falha ao persistir estado do webview', e);
     }
   }
 
   // render inicial
   renderScores();
+  renderXp();
 
   /**
    * Contrato mínimo:
    * - Esperamos mensagens via postMessage com formato { command: string, value?: any }
-   * - Comandos suportados: updateMonsterStyle, changeMonster, updateMonsterLife
+   * - Comandos suportados: updateMonsterStyle, changeMonster, updateMonsterLife, setUser, updateXp
    */
   window.addEventListener('message', (event) => {
     const message = event && event.data;
@@ -76,6 +119,28 @@
       case 'updateMonsterLife':
         updateMonsterLife(message.value);
         break;
+      case 'setUser':
+        if (message.value && typeof message.value === 'string') {
+          state.username = message.value;
+          persistState();
+          renderXp();
+        }
+        break;
+      case 'updateXp':
+        // value expected: { xp: number, level?: number }
+        console.log("Update");
+        console.log(message.value);
+
+        if (message.value && typeof message.value === 'object') {
+          state.xp = Number(message.value.xp) || state.xp;
+          console.log(message.value);
+          if (message.value.level) {
+            state.level = Number(message.value.level) || state.level;
+          }
+          persistState();
+          renderXp();
+        }
+        break;
       default:
         // comando desconhecido — silencioso
         break;
@@ -96,9 +161,7 @@
 
     // Depois do efeito de 'impacto', restauramos o estado e colocamos animação de espera
     setTimeout(() => {
-      // troca para uma animação de 'idle' (ex: pulse)
       monster.style.animation = 'pulse 2s infinite alternate';
-      // força reflow caso precisemos reiniciar a animação
       void monster.offsetWidth;
       monster.style.filter = 'none';
     }, 600);
@@ -129,12 +192,11 @@
    */
   function updateMonsterLife(lifePoints) {
     if (!healthIndicator) {
-      // Não obrigamos a presença do indicador de vida — apenas logamos em dev
       console.warn('updateMonsterLife: .health-indicator não encontrado');
       return;
     }
 
-    const maxLife = parseInt(healthIndicator.dataset.maxLife, 10) || 30; // pode ser sobrescrito via data-max-life
+    const maxLife = parseInt(healthIndicator.dataset.maxLife, 10) || 30;
     const life = Number(lifePoints) || 0;
 
     const percent = clamp((life / maxLife) * 100, 0, 100);
@@ -157,7 +219,6 @@
     damage.className = text !== "-1" ? "critical-hit" : 'damage-float';
     damage.textContent = String(text);
 
-    // estilo base para animação: fixo na tela, começando na posição do monstro
     Object.assign(damage.style, {
       position: 'fixed',
       left: `${getRandomInt(1, 15) - getRandomInt(1, 15) + rect.left + rect.width / 2}px`,
@@ -171,31 +232,22 @@
 
     document.body.appendChild(damage);
 
-    // Força reflow antes de aplicar o estado final (para disparar a transição)
     void damage.offsetWidth;
 
-    // Estado final: sobe e desaparece
     requestAnimationFrame(() => {
       damage.style.transform = 'translate(-50%, 0) translateY(-40px)';
       damage.style.opacity = '0';
     });
 
-    // Remove do DOM após a animação
     setTimeout(() => damage.remove(), 1000);
   }
 
   /* ===== Helpers ===== */
 
-  /** Clamp simples */
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
   }
 
-  /**
-   * Retorna inteiro aleatório entre min e max (inclusivo)
-   * @param {number} min
-   * @param {number} max
-   */
   function getRandomInt(min, max) {
     const a = Math.ceil(min);
     const b = Math.floor(max);
